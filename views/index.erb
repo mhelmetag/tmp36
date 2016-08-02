@@ -4,7 +4,44 @@
     <title>TMP36</title>
   </head>
   <body>
-    <h1><%= temp_c %>&deg;C</h1>
-    <h1><%= temp_f %>&deg;F</h1>
+    <h1><span id="tempC">00.00</span>&deg;C</h1>
+    <h1><span id="tempF">00.00</span>&deg;F</h1>
+    <script type="text/javascript">
+      function update(temps) {
+        tempC = document.getElementById('tempC');
+        tempF = document.getElementById('tempF');
+        tempC.innerHTML = temps.tempC;
+        tempF.innerHTML = temps.tempF;
+        console.log('updated!!!')
+      };
+
+      httpRequest = new XMLHttpRequest();
+
+      httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+          if (httpRequest.status == 200) {
+            temps = JSON.parse(httpRequest.responseText);
+            console.log(temps);
+            update(temps);
+          } else if (httpRequest.responseText) {
+            error = JSON.parse(httpRequest.responseText).error;
+            console.log(error);
+          } else {
+            console.log('somethings really not right');
+          }
+        }
+      }
+
+      function sendAJAX() {
+        httpRequest.open('GET', '/temps');
+        httpRequest.send(null);
+      }
+
+      window.onload = sendAJAX();
+
+      setInterval(function() {
+        sendAJAX();
+      }, 3000);
+    </script>
   </body>
 </html>
